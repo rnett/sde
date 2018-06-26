@@ -498,6 +498,10 @@ object dgmeffects : IntIdTable(columnName = "effectID") {
 
     // Foreign keys
 
+    // Many to One
+    val postExpressionExpression = reference("postExpression", dgmexpressions)
+    val preExpressionExpression = reference("preExpression", dgmexpressions)
+
     // One to Many (not present in object)
 
 
@@ -545,6 +549,10 @@ class dgmeffect(id: EntityID<Int>) : IntEntity(id) {
 
 
     // Foreign keys
+
+    // Many to One
+    val postExpressionExpression by dgmexpression referencedOn dgmeffects.postExpressionExpression
+    val preExpressionExpression by dgmexpression referencedOn dgmeffects.preExpressionExpression
 
     // One to Many
     val dgmeffect_dgmtypeeffects_effect by dgmtypeeffect referrersOn dgmtypeeffects.effect
@@ -794,7 +802,7 @@ object dgmexpressions : IntIdTable(columnName = "expressionID") {
     // Many to One
     val expressionAttribute = reference("expressionAttributeID", dgmattributetypes)
     val arg1Expression = reference("arg1", dgmexpressions)
-    val arg2Expression = reference("arg1", dgmexpressions)
+    val arg2Expression = reference("arg2", dgmexpressions)
     val expressionGroup = reference("expressionGroupID", invgroups)
     val expressionType = reference("expressionTypeID", invtypes)
 
@@ -836,8 +844,10 @@ class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
     val expressionType by invtype referencedOn dgmexpressions.expressionType
 
     // One to Many
-    val dgmexpression_arg1Expresions by dgmexpression referrersOn dgmexpressions.arg1Expression
-    val dgmexpression_arg2Expresions by dgmexpression referrersOn dgmexpressions.arg2Expression
+    val dgmexpression_dgmeffects_postExpression by dgmeffect referrersOn dgmeffects.postExpressionExpression
+    val dgmexpression_dgmeffects_preExpression by dgmeffect referrersOn dgmeffects.preExpressionExpression
+    val dgmexpression_arg1s_ by dgmexpression referrersOn dgmexpressions.arg1Expression
+    val dgmexpression_arg2s_ by dgmexpression referrersOn dgmexpressions.arg2Expression
 
 
     // Helper Methods
