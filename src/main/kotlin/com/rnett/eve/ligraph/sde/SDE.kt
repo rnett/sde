@@ -490,10 +490,10 @@ object dgmeffects : IntIdTable(columnName = "effectID") {
     val propulsionChance = bool("propulsionChance")
     val distribution = integer("distribution")
     var sfxName = varchar("sfxName", 20)
-    val npcUsageChanceAttributeID = integer("npcUsageChanceAttributeID")
-    val npcActivationChanceAttributeID = integer("npcActivationChanceAttributeID")
-    val fittingUsageChanceAttributeID = integer("fittingUsageChanceAttributeID")
-    val modifierInfo = text("modifierInfo")
+    val npcUsageChanceAttributeID = integer("npcUsageChanceAttributeID").nullable()
+    val npcActivationChanceAttributeID = integer("npcActivationChanceAttributeID").nullable()
+    val fittingUsageChanceAttributeID = integer("fittingUsageChanceAttributeID").nullable()
+    val modifierInfo = text("modifierInfo").nullable()
 
 
     // Foreign keys
@@ -787,14 +787,14 @@ object dgmexpressions : IntIdTable(columnName = "expressionID") {
 
     val expressionID = integer("expressionID")
     val operandID = integer("operandID")
-    val arg1 = integer("arg1")
-    val arg2 = integer("arg2")
+    val arg1 = integer("arg1").nullable()
+    val arg2 = integer("arg2").nullable()
     var expressionValue = varchar("expressionValue", 100)
     var description = varchar("description", 1000)
     var expressionName = varchar("expressionName", 500)
-    val expressionTypeID = integer("expressionTypeID")
-    val expressionGroupID = integer("expressionGroupID")
-    val expressionAttributeID = integer("expressionAttributeID")
+    val expressionTypeID = integer("expressionTypeID").nullable()
+    val expressionGroupID = integer("expressionGroupID").nullable()
+    val expressionAttributeID = integer("expressionAttributeID").nullable()
 
 
     // Foreign keys
