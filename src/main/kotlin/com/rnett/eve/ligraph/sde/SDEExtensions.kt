@@ -1,3 +1,5 @@
+package com.rnett.eve.ligraph.sde
+
 import org.jetbrains.exposed.sql.transactions.transaction
 
 val typeCache: MutableMap<Int, invtype?> = HashMap<Int, invtype?>()
@@ -108,6 +110,6 @@ val minerals: List<invtype> = transaction { invgroups.findFromPKs(18)!!.invgroup
 
 val compressedOreTypes: List<invtype> = transaction { oreTypes.filter { it.typeName.contains("Compressed", true) } }
 
-//val ores: List<Ore> = transaction{ invcategories.findFromPKs(25)!!.invcategory_invgroups_category.flatMap { it.invgroup_invtypes_group }.toList() }.map{Ore(it)}
+//val ores: List<com.rnett.eve.ligraph.sde.Ore> = transaction{ com.rnett.eve.ligraph.sde.invcategories.findFromPKs(25)!!.invcategory_invgroups_category.flatMap { it.invgroup_invtypes_group }.toList() }.map{com.rnett.eve.ligraph.sde.Ore(it)}
 
 val compressedOres: List<Ore> = transaction { oreTypes.filter { it.typeName.contains("Compressed", true) } }.map { Ore(it) }
