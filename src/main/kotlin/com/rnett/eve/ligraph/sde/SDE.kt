@@ -153,7 +153,7 @@ class invtype(id: EntityID<Int>) : IntEntity(id) {
     val invtype_invtypematerials_type by invtypematerial referrersOn invtypematerials.type
     val invtype_dgmtypeattributes_type by dgmtypeattribute referrersOn dgmtypeattributes.type
     val invtype_dgmtypeeffects_type by dgmtypeeffect referrersOn dgmtypeeffects.type
-    val invtype_dgmexpressia_expressionType by dgmexpression referrersOn dgmexpressions.expressionType
+    val invtype_dgmexpressia_expressionType by dgmexpression optionalReferrersOn dgmexpressions.expressionType
 
 
     // Helper Methods
@@ -233,7 +233,7 @@ class invgroup(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val invgroup_invtypes_group by invtype referrersOn invtypes.group
-    val invgroup_dgmexpressia_expressionGroup by dgmexpression referrersOn dgmexpressions.expressionGroup
+    val invgroup_dgmexpressia_expressionGroup by dgmexpression optionalReferrersOn dgmexpressions.expressionGroup
 
 
     // Helper Methods
@@ -436,7 +436,7 @@ class dgmattributetype(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val dgmattributetype_dgmtypeattributes_attribute by dgmtypeattribute referrersOn dgmtypeattributes.attribute
-    val dgmattributetype_dgmexpressia_expressionAttribute by dgmexpression referrersOn dgmexpressions.expressionAttribute
+    val dgmattributetype_dgmexpressia_expressionAttribute by dgmexpression optionalReferrersOn dgmexpressions.expressionAttribute
 
 
     // Helper Methods
@@ -837,17 +837,17 @@ class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
     // Foreign keys
 
     // Many to One
-    val expressionAttribute by dgmattributetype referencedOn dgmexpressions.expressionAttribute
-    val arg1Expression by dgmexpression referencedOn dgmexpressions.arg1Expression
-    val arg2Expression by dgmexpression referencedOn dgmexpressions.arg2Expression
-    val expressionGroup by invgroup referencedOn dgmexpressions.expressionGroup
-    val expressionType by invtype referencedOn dgmexpressions.expressionType
+    val expressionAttribute by dgmattributetype optionalReferrersOn dgmexpressions.expressionAttribute
+    val arg1Expression by dgmexpression optionalReferrersOn dgmexpressions.arg1Expression
+    val arg2Expression by dgmexpression optionalReferrersOn dgmexpressions.arg2Expression
+    val expressionGroup by invgroup optionalReferrersOn dgmexpressions.expressionGroup
+    val expressionType by invtype optionalReferrersOn dgmexpressions.expressionType
 
     // One to Many
     val dgmexpression_dgmeffects_postExpression by dgmeffect referrersOn dgmeffects.postExpressionExpression
     val dgmexpression_dgmeffects_preExpression by dgmeffect referrersOn dgmeffects.preExpressionExpression
-    val dgmexpression_arg1s_ by dgmexpression referrersOn dgmexpressions.arg1Expression
-    val dgmexpression_arg2s_ by dgmexpression referrersOn dgmexpressions.arg2Expression
+    val dgmexpression_arg1s_ by dgmexpression optionalReferrersOn dgmexpressions.arg1Expression
+    val dgmexpression_arg2s_ by dgmexpression optionalReferrersOn dgmexpressions.arg2Expression
 
 
     // Helper Methods
