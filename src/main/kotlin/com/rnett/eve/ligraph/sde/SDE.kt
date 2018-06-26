@@ -800,11 +800,11 @@ object dgmexpressions : IntIdTable(columnName = "expressionID") {
     // Foreign keys
 
     // Many to One
-    val expressionAttribute = reference("expressionAttributeID", dgmattributetypes)
-    val arg1Expression = reference("arg1", dgmexpressions)
-    val arg2Expression = reference("arg2", dgmexpressions)
-    val expressionGroup = reference("expressionGroupID", invgroups)
-    val expressionType = reference("expressionTypeID", invtypes)
+    val expressionAttribute = reference("expressionAttributeID", dgmattributetypes).nullable()
+    val arg1Expression = reference("arg1", dgmexpressions).nullable()
+    val arg2Expression = reference("arg2", dgmexpressions).nullable()
+    val expressionGroup = reference("expressionGroupID", invgroups).nullable()
+    val expressionType = reference("expressionTypeID", invtypes).nullable()
 
     // One to Many (not present in object)
 
