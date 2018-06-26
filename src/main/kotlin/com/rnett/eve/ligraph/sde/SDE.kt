@@ -837,11 +837,11 @@ class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
     // Foreign keys
 
     // Many to One
-    val expressionAttribute by dgmattributetype optionalReferrersOn dgmexpressions.expressionAttribute
-    val arg1Expression by dgmexpression optionalReferrersOn dgmexpressions.arg1Expression
-    val arg2Expression by dgmexpression optionalReferrersOn dgmexpressions.arg2Expression
-    val expressionGroup by invgroup optionalReferrersOn dgmexpressions.expressionGroup
-    val expressionType by invtype optionalReferrersOn dgmexpressions.expressionType
+    val expressionAttribute by dgmattributetype optionalReferencedOn dgmexpressions.expressionAttribute
+    val arg1Expression by dgmexpression optionalReferencedOn dgmexpressions.arg1Expression
+    val arg2Expression by dgmexpression optionalReferencedOn dgmexpressions.arg2Expression
+    val expressionGroup by invgroup optionalReferencedOn dgmexpressions.expressionGroup
+    val expressionType by invtype optionalReferencedOn dgmexpressions.expressionType
 
     // One to Many
     val dgmexpression_dgmeffects_postExpression by dgmeffect referrersOn dgmeffects.postExpressionExpression
