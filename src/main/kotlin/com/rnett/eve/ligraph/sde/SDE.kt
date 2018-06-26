@@ -32,7 +32,6 @@ object industryactivityrecipes : IntIdTable(columnName = "typeID\" << 8 | \"acti
     fun idFromPKs(typeID: Int, activityID: Int, productTypeID: Int, materialTypeID: Int): Int {
         return typeID shl 8 or activityID shl 16 or productTypeID shl 24 or materialTypeID
     }
-
     fun findFromPKs(typeID: Int, activityID: Int, productTypeID: Int, materialTypeID: Int): industryactivityrecipe? {
         return industryactivityrecipe.findById(idFromPKs(typeID, activityID, productTypeID, materialTypeID))
     }
@@ -154,6 +153,7 @@ class invtype(id: EntityID<Int>) : IntEntity(id) {
     val invtype_invtypematerials_type by invtypematerial referrersOn invtypematerials.type
     val invtype_dgmtypeattributes_type by dgmtypeattribute referrersOn dgmtypeattributes.type
     val invtype_dgmtypeeffects_type by dgmtypeeffect referrersOn dgmtypeeffects.type
+    val invtype_dgmexpressia_expressionType by dgmexpression referrersOn dgmexpressions.expressionType
 
 
     // Helper Methods
@@ -233,6 +233,7 @@ class invgroup(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val invgroup_invtypes_group by invtype referrersOn invtypes.group
+    val invgroup_dgmexpressia_expressionGroup by dgmexpression referrersOn dgmexpressions.expressionGroup
 
 
     // Helper Methods
@@ -341,7 +342,6 @@ object invtypematerials : IntIdTable(columnName = "typeID\" << 8 | \"materialTyp
     fun idFromPKs(typeID: Int, materialTypeID: Int): Int {
         return typeID shl 8 or materialTypeID
     }
-
     fun findFromPKs(typeID: Int, materialTypeID: Int): invtypematerial? {
         return invtypematerial.findById(idFromPKs(typeID, materialTypeID))
     }
@@ -436,6 +436,7 @@ class dgmattributetype(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val dgmattributetype_dgmtypeattributes_attribute by dgmtypeattribute referrersOn dgmtypeattributes.attribute
+    val dgmattributetype_dgmexpressia_expressionAttribute by dgmexpression referrersOn dgmexpressions.expressionAttribute
 
 
     // Helper Methods
@@ -593,7 +594,6 @@ object dgmtypeattributes : IntIdTable(columnName = "typeID\" << 8 | \"attributeI
     fun idFromPKs(typeID: Int, attributeID: Int): Int {
         return typeID shl 8 or attributeID
     }
-
     fun findFromPKs(typeID: Int, attributeID: Int): dgmtypeattribute? {
         return dgmtypeattribute.findById(idFromPKs(typeID, attributeID))
     }
@@ -657,7 +657,6 @@ object dgmtypeeffects : IntIdTable(columnName = "typeID\" << 8 | \"effectID") {
     fun idFromPKs(typeID: Int, effectID: Int): Int {
         return typeID shl 8 or effectID
     }
-
     fun findFromPKs(typeID: Int, effectID: Int): dgmtypeeffect? {
         return dgmtypeeffect.findById(idFromPKs(typeID, effectID))
     }
@@ -767,6 +766,96 @@ class invmarketgroup(id: EntityID<Int>) : IntEntity(id) {
 
     override fun hashCode(): Int {
         return marketGroupID
+    }
+
+
+}
+
+
+object dgmexpressions : IntIdTable(columnName = "expressionID") {
+
+    // Database columns
+
+
+    val expressionID = integer("expressionID")
+    val operandID = integer("operandID")
+    val arg1 = integer("arg1")
+    val arg2 = integer("arg2")
+    var expressionValue = varchar("expressionValue", 100)
+    var description = varchar("description", 1000)
+    var expressionName = varchar("expressionName", 500)
+    val expressionTypeID = integer("expressionTypeID")
+    val expressionGroupID = integer("expressionGroupID")
+    val expressionAttributeID = integer("expressionAttributeID")
+
+
+    // Foreign keys
+
+    // Many to One
+    val expressionAttribute = reference("expressionAttributeID", dgmattributetypes)
+    val arg1Expression = reference("arg1", dgmexpressions)
+    val arg2Expression = reference("arg1", dgmexpressions)
+    val expressionGroup = reference("expressionGroupID", invgroups)
+    val expressionType = reference("expressionTypeID", invtypes)
+
+    // One to Many (not present in object)
+
+
+    // Helper methods
+
+    fun findFromPKs(expressionID: Int): dgmexpression? {
+        return dgmexpression.findById(expressionID)
+    }
+
+}
+
+class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<dgmexpression>(dgmexpressions)
+
+    // Database columns
+
+    var expressionID by dgmexpressions.expressionID
+    var operandID by dgmexpressions.operandID
+    var arg1 by dgmexpressions.arg1
+    var arg2 by dgmexpressions.arg2
+    var expressionValue by dgmexpressions.expressionValue
+    var description by dgmexpressions.description
+    var expressionName by dgmexpressions.expressionName
+    var expressionTypeID by dgmexpressions.expressionTypeID
+    var expressionGroupID by dgmexpressions.expressionGroupID
+    var expressionAttributeID by dgmexpressions.expressionAttributeID
+
+
+    // Foreign keys
+
+    // Many to One
+    val expressionAttribute by dgmattributetype referencedOn dgmexpressions.expressionAttribute
+    val arg1Expression by dgmexpression referencedOn dgmexpressions.arg1Expression
+    val arg2Expression by dgmexpression referencedOn dgmexpressions.arg2Expression
+    val expressionGroup by invgroup referencedOn dgmexpressions.expressionGroup
+    val expressionType by invtype referencedOn dgmexpressions.expressionType
+
+    // One to Many
+    val dgmexpression_arg1Expresions by dgmexpression referrersOn dgmexpressions.arg1Expression
+    val dgmexpression_arg2Expresions by dgmexpression referrersOn dgmexpressions.arg2Expression
+
+
+    // Helper Methods
+
+    override fun toString(): String {
+        return this.expressionName
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is dgmexpression)
+            return false
+
+        other
+        return other.expressionID == expressionID
+    }
+
+    override fun hashCode(): Int {
+        return expressionID
     }
 
 
