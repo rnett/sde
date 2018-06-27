@@ -587,8 +587,8 @@ object dgmtypeattributes : IntIdTable(columnName = "typeID\" << 8 | \"attributeI
 
     val typeID = integer("typeID")
     val attributeID = integer("attributeID")
-    val valueInt = integer("valueInt")
-    var valueFloat = decimal("valueFloat", 200, 200)
+    val valueInt = integer("valueInt").nullable()
+    var valueFloat = decimal("valueFloat", 200, 200).nullable()
 
 
     // Foreign keys
