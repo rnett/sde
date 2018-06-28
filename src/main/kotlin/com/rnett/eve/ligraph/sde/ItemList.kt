@@ -126,8 +126,8 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
 
         val newPricesIDs = json["appraisal"]["items"].asJsonArray.map {
             Pair(it["typeID"].asInt,
-                    Price(it["prices"]["com.rnett.eve.ligraph.sde.buy"]["max"].asDouble,
-                            it["prices"]["com.rnett.eve.ligraph.sde.sell"]["min"].asDouble)
+                    Price(it["prices"]["buy"]["max"].asDouble,
+                            it["prices"]["sell"]["min"].asDouble)
             )
         }.toMap()
 
