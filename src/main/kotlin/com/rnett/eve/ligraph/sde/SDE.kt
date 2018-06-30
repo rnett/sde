@@ -153,7 +153,7 @@ class invtype(id: EntityID<Int>) : IntEntity(id) {
     val invtype_invtypematerials_type by invtypematerial referrersOn invtypematerials.type
     val invtype_dgmtypeattributes_type by dgmtypeattribute referrersOn dgmtypeattributes.type
     val invtype_dgmtypeeffects_type by dgmtypeeffect referrersOn dgmtypeeffects.type
-    val invtype_dgmexpressia_expressionType by dgmexpression optionalReferrersOn dgmexpressions.expressionType
+    val invtype_dgmexpressia_expressionType by dgmexpression referrersOn dgmexpressions.expressionType
 
 
     // Helper Methods
@@ -233,7 +233,7 @@ class invgroup(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val invgroup_invtypes_group by invtype referrersOn invtypes.group
-    val invgroup_dgmexpressia_expressionGroup by dgmexpression optionalReferrersOn dgmexpressions.expressionGroup
+    val invgroup_dgmexpressia_expressionGroup by dgmexpression referrersOn dgmexpressions.expressionGroup
 
 
     // Helper Methods
@@ -436,7 +436,7 @@ class dgmattributetype(id: EntityID<Int>) : IntEntity(id) {
 
     // One to Many
     val dgmattributetype_dgmtypeattributes_attribute by dgmtypeattribute referrersOn dgmtypeattributes.attribute
-    val dgmattributetype_dgmexpressia_expressionAttribute by dgmexpression optionalReferrersOn dgmexpressions.expressionAttribute
+    val dgmattributetype_dgmexpressia_expressionAttribute by dgmexpression referrersOn dgmexpressions.expressionAttribute
 
 
     // Helper Methods
@@ -469,8 +469,8 @@ object dgmeffects : IntIdTable(columnName = "effectID") {
     val effectID = integer("effectID")
     var effectName = varchar("effectName", 400)
     val effectCategory = integer("effectCategory")
-    val preExpression = integer("preExpression")
-    val postExpression = integer("postExpression")
+    val preExpression = integer("preExpression").nullable()
+    val postExpression = integer("postExpression").nullable()
     var description = varchar("description", 1000)
     var guid = varchar("guid", 60)
     val iconID = integer("iconID")
@@ -490,17 +490,17 @@ object dgmeffects : IntIdTable(columnName = "effectID") {
     val propulsionChance = bool("propulsionChance")
     val distribution = integer("distribution")
     var sfxName = varchar("sfxName", 20)
-    val npcUsageChanceAttributeID = integer("npcUsageChanceAttributeID").nullable()
-    val npcActivationChanceAttributeID = integer("npcActivationChanceAttributeID").nullable()
-    val fittingUsageChanceAttributeID = integer("fittingUsageChanceAttributeID").nullable()
-    val modifierInfo = text("modifierInfo").nullable()
+    val npcUsageChanceAttributeID = integer("npcUsageChanceAttributeID")
+    val npcActivationChanceAttributeID = integer("npcActivationChanceAttributeID")
+    val fittingUsageChanceAttributeID = integer("fittingUsageChanceAttributeID")
+    val modifierInfo = text("modifierInfo")
 
 
     // Foreign keys
 
     // Many to One
-    val postExpressionExpression = reference("postExpression", dgmexpressions)
-    val preExpressionExpression = reference("preExpression", dgmexpressions)
+    val postExpressionExpression = optReference("postExpression", dgmexpressions)
+    val preExpressionExpression = optReference("preExpression", dgmexpressions)
 
     // One to Many (not present in object)
 
@@ -551,8 +551,8 @@ class dgmeffect(id: EntityID<Int>) : IntEntity(id) {
     // Foreign keys
 
     // Many to One
-    val postExpressionExpression by dgmexpression referencedOn dgmeffects.postExpressionExpression
-    val preExpressionExpression by dgmexpression referencedOn dgmeffects.preExpressionExpression
+    val postExpressionExpression by dgmexpression optionalReferencedOn dgmeffects.postExpressionExpression
+    val preExpressionExpression by dgmexpression optionalReferencedOn dgmeffects.preExpressionExpression
 
     // One to Many
     val dgmeffect_dgmtypeeffects_effect by dgmtypeeffect referrersOn dgmtypeeffects.effect
@@ -587,8 +587,8 @@ object dgmtypeattributes : IntIdTable(columnName = "typeID\" << 8 | \"attributeI
 
     val typeID = integer("typeID")
     val attributeID = integer("attributeID")
-    val valueInt = integer("valueInt").nullable()
-    var valueFloat = decimal("valueFloat", 200, 200).nullable()
+    val valueInt = integer("valueInt")
+    var valueFloat = decimal("valueFloat", 200, 200)
 
 
     // Foreign keys
@@ -792,19 +792,19 @@ object dgmexpressions : IntIdTable(columnName = "expressionID") {
     var expressionValue = varchar("expressionValue", 100)
     var description = varchar("description", 1000)
     var expressionName = varchar("expressionName", 500)
-    val expressionTypeID = integer("expressionTypeID").nullable()
-    val expressionGroupID = integer("expressionGroupID").nullable()
-    val expressionAttributeID = integer("expressionAttributeID").nullable()
+    val expressionTypeID = integer("expressionTypeID")
+    val expressionGroupID = integer("expressionGroupID")
+    val expressionAttributeID = integer("expressionAttributeID")
 
 
     // Foreign keys
 
     // Many to One
-    val expressionAttribute = reference("expressionAttributeID", dgmattributetypes).nullable()
-    val arg1Expression = reference("arg1", dgmexpressions).nullable()
-    val arg2Expression = reference("arg2", dgmexpressions).nullable()
-    val expressionGroup = reference("expressionGroupID", invgroups).nullable()
-    val expressionType = reference("expressionTypeID", invtypes).nullable()
+    val expressionAttribute = reference("expressionAttributeID", dgmattributetypes)
+    val arg1Expression = optReference("", dgmexpressions)
+    val arg2Expression = optReference("", dgmexpressions)
+    val expressionGroup = reference("expressionGroupID", invgroups)
+    val expressionType = reference("expressionTypeID", invtypes)
 
     // One to Many (not present in object)
 
@@ -837,17 +837,17 @@ class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
     // Foreign keys
 
     // Many to One
-    val expressionAttribute by dgmattributetype optionalReferencedOn dgmexpressions.expressionAttribute
+    val expressionAttribute by dgmattributetype referencedOn dgmexpressions.expressionAttribute
     val arg1Expression by dgmexpression optionalReferencedOn dgmexpressions.arg1Expression
     val arg2Expression by dgmexpression optionalReferencedOn dgmexpressions.arg2Expression
-    val expressionGroup by invgroup optionalReferencedOn dgmexpressions.expressionGroup
-    val expressionType by invtype optionalReferencedOn dgmexpressions.expressionType
+    val expressionGroup by invgroup referencedOn dgmexpressions.expressionGroup
+    val expressionType by invtype referencedOn dgmexpressions.expressionType
 
     // One to Many
-    val dgmexpression_dgmeffects_postExpression by dgmeffect referrersOn dgmeffects.postExpressionExpression
-    val dgmexpression_dgmeffects_preExpression by dgmeffect referrersOn dgmeffects.preExpressionExpression
-    val dgmexpression_arg1s_ by dgmexpression optionalReferrersOn dgmexpressions.arg1Expression
-    val dgmexpression_arg2s_ by dgmexpression optionalReferrersOn dgmexpressions.arg2Expression
+    val dgmexpression_dgmeffects_postExpression by dgmeffect optionalReferrersOn dgmeffects.postExpressionExpression
+    val dgmexpression_dgmeffects_preExpression by dgmeffect optionalReferrersOn dgmeffects.preExpressionExpression
+    val dgmexpression_arg1s by dgmexpression optionalReferrersOn dgmexpressions.arg1Expression
+    val dgmexpression_arg2s by dgmexpression optionalReferrersOn dgmexpressions.arg2Expression
 
 
     // Helper Methods
@@ -866,6 +866,510 @@ class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
 
     override fun hashCode(): Int {
         return expressionID
+    }
+
+
+}
+
+
+object mapsolarsystems : IntIdTable(columnName = "solarSystemID") {
+
+    // Database columns
+
+
+    val regionID = integer("regionID")
+    val constellationID = integer("constellationID")
+    val solarSystemID = integer("solarSystemID")
+    var solarSystemName = varchar("solarSystemName", 100)
+    var x = decimal("x", 200, 200)
+    var y = decimal("y", 200, 200)
+    var z = decimal("z", 200, 200)
+    var xMin = decimal("xMin", 200, 200)
+    var xMax = decimal("xMax", 200, 200)
+    var yMin = decimal("yMin", 200, 200)
+    var yMax = decimal("yMax", 200, 200)
+    var zMin = decimal("zMin", 200, 200)
+    var zMax = decimal("zMax", 200, 200)
+    var luminosity = decimal("luminosity", 200, 200)
+    val border = bool("border")
+    val fringe = bool("fringe")
+    val corridor = bool("corridor")
+    val hub = bool("hub")
+    val international = bool("international")
+    val regional = bool("regional")
+    val hasConstellation = bool("constellation")
+    var security = decimal("security", 200, 200)
+    val factionID = integer("factionID")
+    var radius = decimal("radius", 200, 200)
+    val sunTypeID = integer("sunTypeID")
+    var securityClass = varchar("securityClass", 2)
+
+
+    // Foreign keys
+
+    // Many to One
+    val constellation = reference("constellationID", mapconstellations)
+    val region = reference("regionID", mapregions)
+
+    // One to Many (not present in object)
+
+
+    // Helper methods
+
+    fun findFromPKs(solarSystemID: Int): mapsolarsystem? {
+        return mapsolarsystem.findById(solarSystemID)
+    }
+
+}
+
+class mapsolarsystem(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapsolarsystem>(mapsolarsystems)
+
+    // Database columns
+
+    var regionID by mapsolarsystems.regionID
+    var constellationID by mapsolarsystems.constellationID
+    var solarSystemID by mapsolarsystems.solarSystemID
+    var solarSystemName by mapsolarsystems.solarSystemName
+    var x by mapsolarsystems.x
+    var y by mapsolarsystems.y
+    var z by mapsolarsystems.z
+    var xMin by mapsolarsystems.xMin
+    var xMax by mapsolarsystems.xMax
+    var yMin by mapsolarsystems.yMin
+    var yMax by mapsolarsystems.yMax
+    var zMin by mapsolarsystems.zMin
+    var zMax by mapsolarsystems.zMax
+    var luminosity by mapsolarsystems.luminosity
+    var border by mapsolarsystems.border
+    var fringe by mapsolarsystems.fringe
+    var corridor by mapsolarsystems.corridor
+    var hub by mapsolarsystems.hub
+    var international by mapsolarsystems.international
+    var regional by mapsolarsystems.regional
+    var hasConstellation by mapsolarsystems.constellation
+    var security by mapsolarsystems.security
+    var factionID by mapsolarsystems.factionID
+    var radius by mapsolarsystems.radius
+    var sunTypeID by mapsolarsystems.sunTypeID
+    var securityClass by mapsolarsystems.securityClass
+
+
+    // Foreign keys
+
+    // Many to One
+    val constellation by mapconstellation referencedOn mapsolarsystems.constellation
+    val region by mapregion referencedOn mapsolarsystems.region
+
+    // One to Many
+    val mapsolarsystem_mapsolarsystemjumps_fromSolarSystem by mapsolarsystemjump referrersOn mapsolarsystemjumps.fromSolarSystem
+    val mapsolarsystem_mapsolarsystemjumps_toSolarSystem by mapsolarsystemjump referrersOn mapsolarsystemjumps.toSolarSystem
+
+
+    // Helper Methods
+
+    override fun toString(): String {
+        return this.solarSystemName
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapsolarsystem)
+            return false
+
+        other
+        return other.solarSystemID == solarSystemID
+    }
+
+    override fun hashCode(): Int {
+        return solarSystemID
+    }
+
+
+}
+
+
+object mapsolarsystemjumps : IntIdTable(columnName = "fromSolarSystemID\" << 8 | \"toSolarSystemID") {
+
+    // Database columns
+
+
+    val fromRegionID = integer("fromRegionID")
+    val fromConstellationID = integer("fromConstellationID")
+    val fromSolarSystemID = integer("fromSolarSystemID")
+    val toSolarSystemID = integer("toSolarSystemID")
+    val toConstellationID = integer("toConstellationID")
+    val toRegionID = integer("toRegionID")
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromConstellation = reference("fromConstellationID", mapconstellations)
+    val toConstellation = reference("toConstellationID", mapconstellations)
+    val fromRegion = reference("fromRegionID", mapregions)
+    val toRegion = reference("toRegionID", mapregions)
+    val fromSolarSystem = reference("fromSolarSystemID", mapsolarsystems)
+    val toSolarSystem = reference("toSolarSystemID", mapsolarsystems)
+
+    // Helper methods
+
+    fun idFromPKs(fromSolarSystemID: Int, toSolarSystemID: Int): Int {
+        return fromSolarSystemID shl 8 or toSolarSystemID
+    }
+
+    fun findFromPKs(fromSolarSystemID: Int, toSolarSystemID: Int): mapsolarsystemjump? {
+        return mapsolarsystemjump.findById(idFromPKs(fromSolarSystemID, toSolarSystemID))
+    }
+
+}
+
+class mapsolarsystemjump(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapsolarsystemjump>(mapsolarsystemjumps)
+
+    // Database columns
+
+    var fromRegionID by mapsolarsystemjumps.fromRegionID
+    var fromConstellationID by mapsolarsystemjumps.fromConstellationID
+    var fromSolarSystemID by mapsolarsystemjumps.fromSolarSystemID
+    var toSolarSystemID by mapsolarsystemjumps.toSolarSystemID
+    var toConstellationID by mapsolarsystemjumps.toConstellationID
+    var toRegionID by mapsolarsystemjumps.toRegionID
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromConstellation by mapconstellation referencedOn mapsolarsystemjumps.fromConstellation
+    val toConstellation by mapconstellation referencedOn mapsolarsystemjumps.toConstellation
+    val fromRegion by mapregion referencedOn mapsolarsystemjumps.fromRegion
+    val toRegion by mapregion referencedOn mapsolarsystemjumps.toRegion
+    val fromSolarSystem by mapsolarsystem referencedOn mapsolarsystemjumps.fromSolarSystem
+    val toSolarSystem by mapsolarsystem referencedOn mapsolarsystemjumps.toSolarSystem
+
+
+    // Helper Methods
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapsolarsystemjump)
+            return false
+
+        other
+        return other.fromSolarSystemID == fromSolarSystemID && other.toSolarSystemID == toSolarSystemID
+    }
+
+    override fun hashCode(): Int {
+        return mapsolarsystemjumps.idFromPKs(fromSolarSystemID, toSolarSystemID)
+    }
+
+
+}
+
+
+object mapregions : IntIdTable(columnName = "regionID") {
+
+    // Database columns
+
+
+    val regionID = integer("regionID")
+    var regionName = varchar("regionName", 100)
+    var x = decimal("x", 200, 200)
+    var y = decimal("y", 200, 200)
+    var z = decimal("z", 200, 200)
+    var xMin = decimal("xMin", 200, 200)
+    var xMax = decimal("xMax", 200, 200)
+    var yMin = decimal("yMin", 200, 200)
+    var yMax = decimal("yMax", 200, 200)
+    var zMin = decimal("zMin", 200, 200)
+    var zMax = decimal("zMax", 200, 200)
+    val factionID = integer("factionID")
+    var radius = decimal("radius", 200, 200)
+
+
+    // Foreign keys
+
+    // One to Many (not present in object)
+
+
+    // Helper methods
+
+    fun findFromPKs(regionID: Int): mapregion? {
+        return mapregion.findById(regionID)
+    }
+
+}
+
+class mapregion(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapregion>(mapregions)
+
+    // Database columns
+
+    var regionID by mapregions.regionID
+    var regionName by mapregions.regionName
+    var x by mapregions.x
+    var y by mapregions.y
+    var z by mapregions.z
+    var xMin by mapregions.xMin
+    var xMax by mapregions.xMax
+    var yMin by mapregions.yMin
+    var yMax by mapregions.yMax
+    var zMin by mapregions.zMin
+    var zMax by mapregions.zMax
+    var factionID by mapregions.factionID
+    var radius by mapregions.radius
+
+
+    // Foreign keys
+
+    // One to Many
+    val mapregion_mapsolarsystems_region by mapsolarsystem referrersOn mapsolarsystems.region
+    val mapregion_mapsolarsystemjumps_fromRegion by mapsolarsystemjump referrersOn mapsolarsystemjumps.fromRegion
+    val mapregion_mapsolarsystemjumps_toRegion by mapsolarsystemjump referrersOn mapsolarsystemjumps.toRegion
+    val mapregion_mapregionjumps_fromRegion by mapregionjump referrersOn mapregionjumps.fromRegion
+    val mapregion_mapregionjumps_toRegion by mapregionjump referrersOn mapregionjumps.toRegion
+    val mapregion_mapconstellatia_region by mapconstellation referrersOn mapconstellations.region
+    val mapregion_mapconstellationjumps_fromRegion by mapconstellationjump referrersOn mapconstellationjumps.fromRegion
+    val mapregion_mapconstellationjumps_toRegion by mapconstellationjump referrersOn mapconstellationjumps.toRegion
+
+
+    // Helper Methods
+
+    override fun toString(): String {
+        return this.regionName
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapregion)
+            return false
+
+        other
+        return other.regionID == regionID
+    }
+
+    override fun hashCode(): Int {
+        return regionID
+    }
+
+
+}
+
+
+object mapregionjumps : IntIdTable(columnName = "fromRegionID\" << 8 | \"toRegionID") {
+
+    // Database columns
+
+
+    val fromRegionID = integer("fromRegionID")
+    val toRegionID = integer("toRegionID")
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromRegion = reference("fromRegionID", mapregions)
+    val toRegion = reference("toRegionID", mapregions)
+
+    // Helper methods
+
+    fun idFromPKs(fromRegionID: Int, toRegionID: Int): Int {
+        return fromRegionID shl 8 or toRegionID
+    }
+
+    fun findFromPKs(fromRegionID: Int, toRegionID: Int): mapregionjump? {
+        return mapregionjump.findById(idFromPKs(fromRegionID, toRegionID))
+    }
+
+}
+
+class mapregionjump(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapregionjump>(mapregionjumps)
+
+    // Database columns
+
+    var fromRegionID by mapregionjumps.fromRegionID
+    var toRegionID by mapregionjumps.toRegionID
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromRegion by mapregion referencedOn mapregionjumps.fromRegion
+    val toRegion by mapregion referencedOn mapregionjumps.toRegion
+
+
+    // Helper Methods
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapregionjump)
+            return false
+
+        other
+        return other.fromRegionID == fromRegionID && other.toRegionID == toRegionID
+    }
+
+    override fun hashCode(): Int {
+        return mapregionjumps.idFromPKs(fromRegionID, toRegionID)
+    }
+
+
+}
+
+
+object mapconstellations : IntIdTable(columnName = "constellationID") {
+
+    // Database columns
+
+
+    val regionID = integer("regionID")
+    val constellationID = integer("constellationID")
+    var constellationName = varchar("constellationName", 100)
+    var x = decimal("x", 200, 200)
+    var y = decimal("y", 200, 200)
+    var z = decimal("z", 200, 200)
+    var xMin = decimal("xMin", 200, 200)
+    var xMax = decimal("xMax", 200, 200)
+    var yMin = decimal("yMin", 200, 200)
+    var yMax = decimal("yMax", 200, 200)
+    var zMin = decimal("zMin", 200, 200)
+    var zMax = decimal("zMax", 200, 200)
+    val factionID = integer("factionID")
+    var radius = decimal("radius", 200, 200)
+
+
+    // Foreign keys
+
+    // Many to One
+    val region = reference("regionID", mapregions)
+
+    // One to Many (not present in object)
+
+
+    // Helper methods
+
+    fun findFromPKs(constellationID: Int): mapconstellation? {
+        return mapconstellation.findById(constellationID)
+    }
+
+}
+
+class mapconstellation(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapconstellation>(mapconstellations)
+
+    // Database columns
+
+    var regionID by mapconstellations.regionID
+    var constellationID by mapconstellations.constellationID
+    var constellationName by mapconstellations.constellationName
+    var x by mapconstellations.x
+    var y by mapconstellations.y
+    var z by mapconstellations.z
+    var xMin by mapconstellations.xMin
+    var xMax by mapconstellations.xMax
+    var yMin by mapconstellations.yMin
+    var yMax by mapconstellations.yMax
+    var zMin by mapconstellations.zMin
+    var zMax by mapconstellations.zMax
+    var factionID by mapconstellations.factionID
+    var radius by mapconstellations.radius
+
+
+    // Foreign keys
+
+    // Many to One
+    val region by mapregion referencedOn mapconstellations.region
+
+    // One to Many
+    val mapconstellation_mapsolarsystems_constellation by mapsolarsystem referrersOn mapsolarsystems.constellation
+    val mapconstellation_mapsolarsystemjumps_fromConstellation by mapsolarsystemjump referrersOn mapsolarsystemjumps.fromConstellation
+    val mapconstellation_mapsolarsystemjumps_toConstellation by mapsolarsystemjump referrersOn mapsolarsystemjumps.toConstellation
+    val mapconstellation_mapconstellationjumps_fromConstellation by mapconstellationjump referrersOn mapconstellationjumps.fromConstellation
+    val mapconstellation_mapconstellationjumps_toConstellation by mapconstellationjump referrersOn mapconstellationjumps.toConstellation
+
+
+    // Helper Methods
+
+    override fun toString(): String {
+        return this.constellationName
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapconstellation)
+            return false
+
+        other
+        return other.constellationID == constellationID
+    }
+
+    override fun hashCode(): Int {
+        return constellationID
+    }
+
+
+}
+
+
+object mapconstellationjumps : IntIdTable(columnName = "fromConstellationID\" << 8 | \"toConstellationID") {
+
+    // Database columns
+
+
+    val fromRegionID = integer("fromRegionID")
+    val fromConstellationID = integer("fromConstellationID")
+    val toConstellationID = integer("toConstellationID")
+    val toRegionID = integer("toRegionID")
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromConstellation = reference("fromConstellationID", mapconstellations)
+    val toConstellation = reference("toConstellationID", mapconstellations)
+    val fromRegion = reference("fromRegionID", mapregions)
+    val toRegion = reference("toRegionID", mapregions)
+
+    // Helper methods
+
+    fun idFromPKs(fromConstellationID: Int, toConstellationID: Int): Int {
+        return fromConstellationID shl 8 or toConstellationID
+    }
+
+    fun findFromPKs(fromConstellationID: Int, toConstellationID: Int): mapconstellationjump? {
+        return mapconstellationjump.findById(idFromPKs(fromConstellationID, toConstellationID))
+    }
+
+}
+
+class mapconstellationjump(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<mapconstellationjump>(mapconstellationjumps)
+
+    // Database columns
+
+    var fromRegionID by mapconstellationjumps.fromRegionID
+    var fromConstellationID by mapconstellationjumps.fromConstellationID
+    var toConstellationID by mapconstellationjumps.toConstellationID
+    var toRegionID by mapconstellationjumps.toRegionID
+
+
+    // Foreign keys
+
+    // Many to One
+    val fromConstellation by mapconstellation referencedOn mapconstellationjumps.fromConstellation
+    val toConstellation by mapconstellation referencedOn mapconstellationjumps.toConstellation
+    val fromRegion by mapregion referencedOn mapconstellationjumps.fromRegion
+    val toRegion by mapregion referencedOn mapconstellationjumps.toRegion
+
+
+    // Helper Methods
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is mapconstellationjump)
+            return false
+
+        other
+        return other.fromConstellationID == fromConstellationID && other.toConstellationID == toConstellationID
+    }
+
+    override fun hashCode(): Int {
+        return mapconstellationjumps.idFromPKs(fromConstellationID, toConstellationID)
     }
 
 
