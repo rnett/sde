@@ -150,21 +150,10 @@ fun ItemList.appraise() = Appraisal(getPrices(), this)
 
 fun ItemList.getPrices() = getPrices(this.keys.toList())
 
-val evepraisalCache: MutableMap<ItemList, Pair<String, Long>> = mutableMapOf()
-
-fun ItemList.evePraisal(): String {
-    val neededPrices: MutableList<invtype> = mutableListOf()
-
-    // check cache
-    if (evepraisalCache.containsKey(this) &&
-            Interval<Millisecond>(Calendar.getInstance().timeInMillis - evepraisalCache[this]!!.second) <= 10.minutes)
-        return evepraisalCache[this]!!.first
-
-
-    // update cache
+val evepraisalCache = Cache<ItemList, String>(10.minutes) {
     val client = HttpClient(Apache)
 
-    val url = "https://evepraisal.com/appraisal.json?market=jita&raw_textarea=${URLEncoder.encode(this.entries
+    val url = "https://evepraisal.com/appraisal.json?market=jita&raw_textarea=${URLEncoder.encode(it.entries
             .joinToString("%0A") { it.key.typeName + "%09" + it.value.toString() })}"
 
     val text: String = runBlocking {
@@ -172,7 +161,7 @@ fun ItemList.evePraisal(): String {
             headers["User-Agent"] = "Ligraph/jnett96@gmail.com.  Calls are cached."
         }
     }
-
-    evepraisalCache[this] = Pair(JsonParser().parse(text).asJsonObject["appraisal"]["id"].asString, Calendar.getInstance().timeInMillis)
-    return evepraisalCache[this]!!.first
+    JsonParser().parse(text).asJsonObject["appraisal"]["id"].asString
 }
+
+fun ItemList.evePraisal(): String = evepraisalCache[this]

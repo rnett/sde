@@ -2,45 +2,27 @@ package com.rnett.eve.ligraph.sde
 
 import org.jetbrains.exposed.sql.transactions.transaction
 
-val typeCache: MutableMap<Int, invtype?> = HashMap<Int, invtype?>()
+val typeCache: Cache<Int, invtype?> = Cache {
+    val type = transaction { invtypes.findFromPKs(it) }
 
-fun invtypes.fromID(typeID: Int): invtype? {
+    if (type != null)
+        nameCache.put(type.typeName, type)
 
-    if (typeCache.containsKey(typeID))
-        return typeCache[typeID]
-
-    var i: invtype? = null
-    transaction {
-        i = invtype[typeID]
-    }
-
-    typeCache[typeID] = i
-
-    if (i != null)
-        nameCache[i!!.typeName] = i
-
-    return i
+    type
 }
 
-val nameCache: MutableMap<String, invtype?> = HashMap<String, invtype?>()
+fun invtypes.fromID(typeID: Int): invtype? = typeCache[typeID]
 
-fun invtypes.fromName(typeName: String): invtype? {
+val nameCache = Cache<String, invtype?> {
+    val type = transaction { invtype.find { invtypes.typeName eq it }.firstOrNull() }
 
-    if (nameCache.containsKey(typeName))
-        return nameCache[typeName]
+    if (type != null)
+        typeCache.put(type.typeID, type)
 
-    var i: invtype? = null
-    transaction {
-        i = invtype.find { invtypes.typeName eq typeName }.firstOrNull()
-    }
-
-    nameCache[typeName] = i
-
-    if (i != null)
-        typeCache[i!!.typeID] = i
-
-    return i
+    type
 }
+
+fun invtypes.fromName(typeName: String): invtype? = nameCache[typeName]
 
 fun invtype.imageURL(width: Int) = "https://image.eveonline.com/Type/${typeID}_$width.png"
 
