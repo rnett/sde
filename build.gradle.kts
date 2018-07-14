@@ -29,8 +29,8 @@ dependencies {
     compile("com.github.kizitonwose.time:time:1.0.1")
     compile("org.slf4j:slf4j-simple:1.7.25")
 
-    compile("io.ktor:ktor-client-core:0.9.3-alpha-5")
-    compile("io.ktor:ktor-client-apache:0.9.3-alpha-5")
+    compile("io.ktor:ktor-client-core:0.9.3")
+    compile("io.ktor:ktor-client-apache:0.9.3")
 }
 
 configure<JavaPluginConvention> {
