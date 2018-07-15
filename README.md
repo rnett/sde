@@ -1,4 +1,4 @@
-# sde
+# Kotlin EVE SDE
 EVE SDE DAO Drivers + helper functions
 
 A library that provides Kotlin Exposed DAO wrapers for the EVE SDE.
