@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 plugins {
     java
-    kotlin("jvm") version "1.2.50"
+    kotlin("jvm") version "1.2.51"
     `maven-publish`
     maven
 }

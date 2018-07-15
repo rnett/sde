@@ -95,3 +95,21 @@ val compressedOreTypes: List<invtype> = transaction { oreTypes.filter { it.typeN
 //val ores: List<com.rnett.eve.ligraph.sde.Ore> = transaction{ com.rnett.eve.ligraph.sde.invcategories.findFromPKs(25)!!.invcategory_invgroups_category.flatMap { it.invgroup_invtypes_group }.toList() }.map{com.rnett.eve.ligraph.sde.Ore(it)}
 
 val compressedOres: List<Ore> = transaction { oreTypes.filter { it.typeName.contains("Compressed", true) } }.map { Ore(it) }
+
+val solarSystemCache = Cache<Int, mapsolarsystem> {
+    transaction { mapsolarsystems.findFromPKs(it) }!!
+}
+
+fun mapsolarsystems.fromID(solarSystemID: Int) = solarSystemCache[solarSystemID]
+
+val constellationCache = Cache<Int, mapconstellation> {
+    transaction { mapconstellations.findFromPKs(it) }!!
+}
+
+fun mapconstellations.fromID(constellationID: Int) = constellationCache[constellationID]
+
+val regionCache = Cache<Int, mapregion> {
+    transaction { mapregions.findFromPKs(it) }!!
+}
+
+fun mapregions.fromID(regionID: Int) = regionCache[regionID]
