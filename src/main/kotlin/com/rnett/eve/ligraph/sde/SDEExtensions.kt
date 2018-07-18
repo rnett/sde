@@ -1,5 +1,6 @@
 package com.rnett.eve.ligraph.sde
 
+import com.rnett.core.Cache
 import org.jetbrains.exposed.sql.transactions.transaction
 
 val typeCache: Cache<Int, invtype?> = Cache {
