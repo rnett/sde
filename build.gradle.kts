@@ -23,16 +23,16 @@ dependencies {
     compile(kotlin("stdlib-jdk8"))
     testCompile("junit", "junit", "4.12")
 
-    compile("com.github.rnett:core:1.0.0")
+    implementation("com.github.rnett:core:1.0.0")
 
-    compile("org.postgresql:postgresql:42.2.2.jre7")
-    compile("org.jetbrains.exposed:exposed:0.10.2")
-    compile("com.github.salomonbrys.kotson:kotson:2.5.0")
-    compile("com.github.kizitonwose.time:time:1.0.1")
-    compile("org.slf4j:slf4j-simple:1.7.25")
+    implementation("org.postgresql:postgresql:42.2.2.jre7")
+    implementation("org.jetbrains.exposed:exposed:0.10.2")
+    implementation("com.github.salomonbrys.kotson:kotson:2.5.0")
+    implementation("com.github.kizitonwose.time:time:1.0.1")
+    implementation("org.slf4j:slf4j-simple:1.7.25")
 
-    compile("io.ktor:ktor-client-core:0.9.3")
-    compile("io.ktor:ktor-client-apache:0.9.3")
+    implementation("io.ktor:ktor-client-core:0.9.3")
+    implementation("io.ktor:ktor-client-apache:0.9.3")
 }
 
 configure<JavaPluginConvention> {
