@@ -61,7 +61,7 @@ class ItemList(val map: Map<invtype, Long> = mapOf<invtype, Long>()) : Map<invty
     operator fun div(mult: Number): ItemList = this.mapValues { ceil(it.value / mult.toDouble()).toLong() }.toItemList()
 }
 
-class MutableItemList(map: Map<invtype, Long>) : MutableMap<invtype, Long> {
+class MutableItemList(map: Map<invtype, Long> = mapOf()) : MutableMap<invtype, Long> {
     constructor(items: List<Pair<invtype, Long>>) : this(items.groupBy { it.first }.mapValues { it.value.reduce { p1, p2 -> Pair(p1.first, p1.second + p2.second) }.second }.toMap())
 
     val map = map.toMutableMap()
