@@ -57,7 +57,7 @@ class Ore(val type: invtype) {
         if (!type.isOre)
             throw IllegalArgumentException("type must be an ore type!")
 
-        materials = transaction { type.invtype_invtypematerials_type.map { Pair(it.materialType, it.quantity.toLong()) }.toMap() }
+        materials = transaction { type.invtype_invtypematerials_type.map { Pair(it.materialType, it.quantity.toLong()) }.toItemList() }
 
 
 
@@ -82,7 +82,7 @@ class Ore(val type: invtype) {
             materials.filterKeys { it.typeName == "typeName" }.values.firstOrNull() ?: 0
 
 
-    operator fun get(type: invtype): Long = materials[type] ?: 0
+    operator fun get(type: invtype): Long = materials[type]
 
 }
 

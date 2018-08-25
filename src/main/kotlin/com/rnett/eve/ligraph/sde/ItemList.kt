@@ -137,6 +137,7 @@ class MutableItemList(map: Map<invtype, Long>) : MutableMap<invtype, Long> {
 
     operator fun times(mult: Number): MutableItemList = this.mapValues { ceil(it.value * mult.toDouble()).toLong() }.toMutableItemList()
     operator fun div(mult: Number): MutableItemList = this.mapValues { ceil(it.value / mult.toDouble()).toLong() }.toMutableItemList()
+
 }
 
 fun MutableItemList.parse(raw: String) {
