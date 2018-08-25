@@ -12,12 +12,132 @@ import io.ktor.client.request.post
 import kotlinx.coroutines.experimental.runBlocking
 import java.net.URLEncoder
 import java.util.*
+import kotlin.math.ceil
 
-typealias ItemList = Map<invtype, Long>
+fun Map<invtype, Long>.toItemList() = ItemList(this)
+fun Map<invtype, Long>.toMutableItemList() = MutableItemList(this)
+fun List<Pair<invtype, Long>>.toItemList() = ItemList(this)
+fun List<Pair<invtype, Long>>.toMutableItemList() = MutableItemList(this)
 
-fun ItemList.toMutableItemList() = this.toMutableMap()
+class ItemList(val map: Map<invtype, Long> = mapOf<invtype, Long>()) : Map<invtype, Long> {
+    constructor(items: List<Pair<invtype, Long>>) : this(items.groupBy { it.first }.mapValues { it.value.reduce { p1, p2 -> Pair(p1.first, p1.second + p2.second) }.second }.toMap())
 
-typealias MutableItemList = MutableMap<invtype, Long>
+
+    override val entries: Set<Map.Entry<invtype, Long>>
+        get() = map.entries
+    override val keys: Set<invtype>
+        get() = map.keys
+    override val size: Int
+        get() = map.size
+    override val values: Collection<Long>
+        get() = map.values
+
+    override fun containsKey(key: invtype): Boolean = map.containsKey(key)
+
+    override fun containsValue(value: Long): Boolean = map.containsValue(value)
+
+    override fun get(key: invtype): Long = map.get(key) ?: 0
+
+    override fun isEmpty(): Boolean = map.isEmpty()
+
+    fun toMutableItemList(): ItemList = ItemList(map.toMutableMap())
+
+    operator fun plus(list: Map<invtype, Long>): ItemList {
+        val mil = list.toMutableItemList()
+        mil.addAll(this)
+        return mil.toItemList()
+    }
+
+    operator fun plus(list: List<Pair<invtype, Long>>): ItemList {
+        val mil = list.toMutableItemList()
+        mil.addAll(this)
+        return mil.toItemList()
+    }
+
+    operator fun minus(list: Map<invtype, Long>): ItemList = plus(list.mapValues { it.value * -1 })
+    operator fun minus(list: List<Pair<invtype, Long>>): ItemList = plus(list.map { Pair(it.first, it.second * -1) })
+
+    operator fun times(mult: Number): ItemList = this.mapValues { ceil(it.value * mult.toDouble()).toLong() }.toItemList()
+    operator fun div(mult: Number): ItemList = this.mapValues { ceil(it.value / mult.toDouble()).toLong() }.toItemList()
+}
+
+class MutableItemList(map: Map<invtype, Long>) : MutableMap<invtype, Long> {
+    constructor(items: List<Pair<invtype, Long>>) : this(items.groupBy { it.first }.mapValues { it.value.reduce { p1, p2 -> Pair(p1.first, p1.second + p2.second) }.second }.toMap())
+
+    val map = map.toMutableMap()
+
+    override val size: Int
+        get() = map.size
+
+    override fun containsKey(key: invtype): Boolean = map.containsKey(key)
+
+    override fun containsValue(value: Long): Boolean = map.containsValue(value)
+
+    override fun get(key: invtype): Long = map[key] ?: 0
+
+    override fun isEmpty(): Boolean = map.isEmpty()
+
+    override val entries: MutableSet<MutableMap.MutableEntry<invtype, Long>>
+        get() = map.entries
+    override val keys: MutableSet<invtype>
+        get() = map.keys
+    override val values: MutableCollection<Long>
+        get() = map.values
+
+    override fun clear() = map.clear()
+
+    override fun put(key: invtype, value: Long): Long = map.put(key, value) ?: 0
+
+    fun add(key: invtype, value: Long): Long {
+        return if (map.containsKey(key))
+            map.put(key, map[key]!! + value) ?: 0
+        else
+            map.put(key, value) ?: 0
+    }
+
+    fun removeNegatives() {
+        val bads = map.filter { it.value <= 0 }
+        bads.forEach { map.remove(it.key) }
+    }
+
+    override fun putAll(from: Map<out invtype, Long>) {
+        from.forEach { put(it.key, it.value) }
+    }
+
+    fun putAll(from: List<Pair<out invtype, Long>>) {
+        from.toItemList().forEach { put(it.key, it.value) }
+    }
+
+    fun addAll(from: Map<out invtype, Long>) {
+        from.forEach { add(it.key, it.value) }
+    }
+
+    fun addAll(from: List<Pair<out invtype, Long>>) {
+        from.forEach { add(it.first, it.second) }
+    }
+
+    override fun remove(key: invtype): Long? = map.remove(key)
+
+    operator fun set(key: invtype, value: Long) = put(key, value)
+
+    operator fun plus(list: Map<invtype, Long>): MutableItemList {
+        val mil = list.toMutableItemList()
+        mil.addAll(this)
+        return mil
+    }
+
+    operator fun plus(list: List<Pair<invtype, Long>>): MutableItemList {
+        val mil = list.toMutableItemList()
+        mil.addAll(this)
+        return mil
+    }
+
+    operator fun minus(list: Map<invtype, Long>): MutableItemList = plus(list.mapValues { it.value * -1 })
+    operator fun minus(list: List<Pair<invtype, Long>>): MutableItemList = plus(list.map { Pair(it.first, it.second * -1) })
+
+    operator fun times(mult: Number): MutableItemList = this.mapValues { ceil(it.value * mult.toDouble()).toLong() }.toMutableItemList()
+    operator fun div(mult: Number): MutableItemList = this.mapValues { ceil(it.value / mult.toDouble()).toLong() }.toMutableItemList()
+}
 
 fun MutableItemList.parse(raw: String) {
     this.clear()
@@ -141,11 +261,11 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
 }
 
 data class Appraisal(val prices: Map<invtype, Price>, val amounts: ItemList) {
-    val totalPrices: Map<invtype, Price> = prices.mapValues { it.value * (amounts[it.key] ?: 0) }
+    val totalPrices: Map<invtype, Price> = prices.mapValues { it.value * amounts[it.key] }
     val totalPrice: Price = totalPrices.values.reduce { a, b -> a + b }
 }
 
-fun appraise(types: List<invtype>) = types.map { Pair(it, 1.toLong()) }.toMap().appraise()
+fun appraise(types: List<invtype>) = types.map { Pair(it, 1.toLong()) }.toItemList().appraise()
 
 fun ItemList.appraise() = Appraisal(getPrices(), this)
 

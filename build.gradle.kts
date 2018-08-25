@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 plugins {
     java
-    kotlin("jvm") version "1.2.51"
+    kotlin("jvm") version "1.2.61"
     `maven-publish`
     maven
 }
@@ -23,7 +23,7 @@ dependencies {
     compile(kotlin("stdlib-jdk8"))
     testCompile("junit", "junit", "4.12")
 
-    implementation("com.github.rnett:core:1.0.0")
+    implementation("com.github.rnett:core:1.1.+")
 
     implementation("org.postgresql:postgresql:42.2.2.jre7")
     implementation("org.jetbrains.exposed:exposed:0.10.2")
