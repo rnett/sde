@@ -40,7 +40,7 @@ class ItemList(val map: Map<invtype, Long> = mapOf<invtype, Long>()) : Map<invty
 
     override fun isEmpty(): Boolean = map.isEmpty()
 
-    fun toMutableItemList(): ItemList = ItemList(map.toMutableMap())
+    fun toMutableItemList(): MutableItemList = MutableItemList(map)
 
     operator fun plus(list: Map<invtype, Long>): ItemList {
         val mil = list.toMutableItemList()
@@ -138,6 +138,7 @@ class MutableItemList(map: Map<invtype, Long> = mapOf()) : MutableMap<invtype, L
     operator fun times(mult: Number): MutableItemList = this.mapValues { ceil(it.value * mult.toDouble()).toLong() }.toMutableItemList()
     operator fun div(mult: Number): MutableItemList = this.mapValues { ceil(it.value / mult.toDouble()).toLong() }.toMutableItemList()
 
+    fun toItemList(): ItemList = ItemList(map)
 }
 
 fun MutableItemList.parse(raw: String) {
