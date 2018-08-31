@@ -124,6 +124,7 @@ object invtypes : IntIdTable(columnName = "typeID") {
 class InvTypeAdapter : TypeAdapter<invtype>() {
     override fun read(input: JsonReader): invtype? {
         input.beginObject()
+        input.nextName()
         val c = invtype.findById(input.nextInt())
         input.endObject()
 
