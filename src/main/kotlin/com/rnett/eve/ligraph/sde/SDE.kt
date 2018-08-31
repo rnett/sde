@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.sql.transactions.transaction
 
 
 object industryactivityrecipes : IntIdTable(columnName = "typeID\" << 8 | \"activityID\" << 16 | \"productTypeID\" << 24 | \"materialTypeID") {
