@@ -1,5 +1,9 @@
 package com.rnett.eve.ligraph.sde
 
+import com.google.gson.TypeAdapter
+import com.google.gson.annotations.JsonAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -117,6 +121,23 @@ object invtypes : IntIdTable(columnName = "typeID") {
 
 }
 
+class InvTypeAdapter : TypeAdapter<invtype>() {
+    override fun read(input: JsonReader): invtype? {
+        input.beginObject()
+        val c = invtype.findById(input.nextInt())
+        input.endObject()
+
+        return c
+    }
+
+    override fun write(out: JsonWriter, value: invtype) {
+        out.beginObject()
+        out.name("typeId").value(value.id.value)
+        out.endObject()
+    }
+}
+
+@JsonAdapter(InvTypeAdapter::class)
 class invtype(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<invtype>(invtypes)
 
