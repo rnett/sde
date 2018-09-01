@@ -126,7 +126,7 @@ class InvTypeAdapter : TypeAdapter<invtype>() {
     override fun read(input: JsonReader): invtype? {
         input.beginObject()
         input.nextName()
-        val c = transaction { invtype.findById(input.nextInt()) }
+        val c = transaction { invtypes.fromID(input.nextInt()) }
         input.endObject()
 
         return c
