@@ -23,7 +23,7 @@ dependencies {
     compile(kotlin("stdlib-jdk8"))
     testCompile("junit", "junit", "4.12")
 
-    implementation("com.github.rnett:core:1.1.+")
+    implementation("com.github.rnett:core:2eb997ac2f")
 
     implementation("org.postgresql:postgresql:42.2.2.jre7")
     implementation("org.jetbrains.exposed:exposed:0.10.2")
