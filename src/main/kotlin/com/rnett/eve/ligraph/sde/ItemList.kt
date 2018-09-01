@@ -14,14 +14,13 @@ import java.net.URLEncoder
 import java.util.*
 import kotlin.math.ceil
 
-fun Map<invtype, Long>.toItemList() = ItemList(this)
-fun Map<invtype, Long>.toMutableItemList() = MutableItemList(this)
-fun List<Pair<invtype, Long>>.toItemList() = ItemList(this)
-fun List<Pair<invtype, Long>>.toMutableItemList() = MutableItemList(this)
+fun Map<invtype, out Number>.toItemList() = ItemList(this.mapValues { it.value.toLong() })
+fun Map<invtype, out Number>.toMutableItemList() = MutableItemList(this.mapValues { it.value.toLong() })
+fun List<Pair<invtype, out Number>>.toItemList() = ItemList(this.map { Pair(it.first, it.second.toLong()) })
+fun List<Pair<invtype, out Number>>.toMutableItemList() = MutableItemList(this.map { Pair(it.first, it.second.toLong()) })
 
 class ItemList(val map: Map<invtype, Long> = mapOf<invtype, Long>()) : Map<invtype, Long> {
     constructor(items: List<Pair<invtype, Long>>) : this(items.groupBy { it.first }.mapValues { it.value.reduce { p1, p2 -> Pair(p1.first, p1.second + p2.second) }.second }.toMap())
-
 
     override val entries: Set<Map.Entry<invtype, Long>>
         get() = map.entries
