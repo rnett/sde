@@ -25,7 +25,6 @@ dependencies {
 
     implementation("com.github.rnett:core:ab6f466a24")
 
-    implementation("org.postgresql:postgresql:42.2.2.jre7")
     implementation("org.jetbrains.exposed:exposed:0.10.2")
     implementation("com.github.salomonbrys.kotson:kotson:2.5.0")
     implementation("com.github.kizitonwose.time:time:1.0.1")
