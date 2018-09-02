@@ -23,7 +23,7 @@ dependencies {
     compile(kotlin("stdlib-jdk8"))
     testCompile("junit", "junit", "4.12")
 
-    implementation("com.github.rnett:core:14da79d0b7")
+    implementation("com.github.rnett:core:c54915eb12")
 
     implementation("org.jetbrains.exposed:exposed:0.10.2")
     implementation("com.github.salomonbrys.kotson:kotson:2.5.0")
