@@ -2,22 +2,30 @@ package com.rnett.eve.ligraph.sde
 
 import com.github.salomonbrys.kotson.get
 import com.google.gson.JsonParser
-import com.kizitonwose.time.Interval
-import com.kizitonwose.time.Millisecond
 import com.kizitonwose.time.minutes
 import com.rnett.core.Cache
+import com.rnett.core.ManualCache
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.post
 import kotlinx.coroutines.experimental.runBlocking
 import java.net.URLEncoder
-import java.util.*
 import kotlin.math.ceil
 
 fun Map<invtype, Number>.toItemList() = ItemList(this.mapValues { it.value.toLong() })
 fun Map<invtype, Number>.toMutableItemList() = MutableItemList(this.mapValues { it.value.toLong() })
-fun List<Pair<invtype, Number>>.toItemList() = ItemList(this.map { Pair(it.first, it.second.toLong()) })
-fun List<Pair<invtype, Number>>.toMutableItemList() = MutableItemList(this.map { Pair(it.first, it.second.toLong()) })
+
+fun Collection<Pair<invtype, Number>>.toItemList() = ItemList(this.map { Pair(it.first, it.second.toLong()) })
+fun Collection<Pair<invtype, Number>>.toMutableItemList() = MutableItemList(this.map { Pair(it.first, it.second.toLong()) })
+
+fun Sequence<Pair<invtype, Number>>.toItemList() = ItemList(this.map { Pair(it.first, it.second.toLong()) }.toList())
+fun Sequence<Pair<invtype, Number>>.toMutableItemList() = MutableItemList(this.map { Pair(it.first, it.second.toLong()) }.toList())
+
+fun Collection<Map.Entry<invtype, Number>>.entriesToItemList() = ItemList(this.map { Pair(it.key, it.value.toLong()) })
+fun Collection<Map.Entry<invtype, Number>>.entriesToMutableItemList() = MutableItemList(this.map { Pair(it.key, it.value.toLong()) })
+
+fun Sequence<Map.Entry<invtype, Number>>.entriesToItemList() = ItemList(this.map { Pair(it.key, it.value.toLong()) }.toList())
+fun Sequence<Map.Entry<invtype, Number>>.entriesToMutableItemList() = MutableItemList(this.map { Pair(it.key, it.value.toLong()) }.toList())
 
 class ItemList(val map: Map<invtype, Long> = mapOf<invtype, Long>()) : Map<invtype, Long> {
     constructor(items: List<Pair<invtype, Long>>) : this(items.groupBy { it.first }.mapValues { it.value.reduce { p1, p2 -> Pair(p1.first, p1.second + p2.second) }.second }.toMap())
@@ -213,7 +221,7 @@ fun <E : Collection<Price>> E.buy() = this.map { it.sell }
 fun <T, E : Map<T, Price>> E.sell() = this.mapValues { it.value.sell }
 fun <T, E : Map<T, Price>> E.buy() = this.mapValues { it.value.buy }
 
-val priceCache: MutableMap<invtype, Pair<Price, Long>> = mutableMapOf()
+val priceCache = ManualCache<invtype, Price>(30.minutes)
 
 fun getPrices(types: List<invtype>): Map<invtype, Price> {
     val neededPrices: MutableList<invtype> = mutableListOf()
@@ -221,14 +229,7 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
     // check cache
     types.forEach {
         if (!priceCache.containsKey(it))
-            neededPrices.add(it)
-        else {
-            val p = priceCache[it]!!
-            if (Interval<Millisecond>(Calendar.getInstance().timeInMillis - p.second) > 30.minutes) {
-                priceCache.remove(it)
-                neededPrices.add(it)
-            }
-        }
+            neededPrices += it
     }
 
     // update cache
@@ -255,10 +256,10 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
 
         val newPrices = neededPrices.map { Pair(it, newPricesIDs[it.typeID]!!) }.toMap()
         newPrices.entries.forEach {
-            priceCache[it.key] = Pair(it.value, Calendar.getInstance().timeInMillis)
+            priceCache[it.key] = it.value
         }
     }
-    return types.map { Pair(it, priceCache[it]!!.first) }.toMap()
+    return types.map { Pair(it, priceCache[it]!!) }.toMap()
 }
 
 data class Appraisal(val prices: Map<invtype, Price>, val amounts: ItemList) {
@@ -266,7 +267,7 @@ data class Appraisal(val prices: Map<invtype, Price>, val amounts: ItemList) {
     val totalPrice: Price = totalPrices.values.reduce { a, b -> a + b }
 }
 
-fun appraise(types: List<invtype>) = types.map { Pair(it, 1.toLong()) }.toItemList().appraise()
+fun appraise(types: List<invtype>) = types.map { Pair(it, 1.toLong()) }.toItemList().getPrices().map { it.value }
 
 fun ItemList.appraise() = Appraisal(getPrices(), this)
 
