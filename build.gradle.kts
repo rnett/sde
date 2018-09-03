@@ -25,7 +25,7 @@ dependencies {
 
     implementation("com.github.rnett:core:c54915eb12")
 
-    implementation("org.jetbrains.exposed:exposed:0.10.2")
+    implementation("org.jetbrains.exposed:exposed:0.10.4")
     implementation("com.github.salomonbrys.kotson:kotson:2.5.0")
     implementation("com.github.kizitonwose.time:time:1.0.1")
     implementation("org.slf4j:slf4j-simple:1.7.25")
