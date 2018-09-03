@@ -267,11 +267,10 @@ data class Appraisal(val prices: Map<invtype, Price>, val amounts: ItemList) {
     val totalPrice: Price = totalPrices.values.reduce { a, b -> a + b }
 }
 
-fun appraise(types: List<invtype>) = types.map { Pair(it, 1.toLong()) }.toItemList().getPrices().map { it.value }
-
 fun ItemList.appraise() = Appraisal(getPrices(), this)
 
 fun ItemList.getPrices() = getPrices(this.keys.toList())
+fun Collection<invtype>.getPrices() = getPrices(this.toList())
 
 val evepraisalCache = Cache<ItemList, String>(10.minutes) {
     val client = HttpClient(Apache)
