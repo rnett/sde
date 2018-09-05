@@ -25,9 +25,9 @@ val nameCache = Cache<String, invtype?> {
 
 fun invtypes.fromName(typeName: String): invtype? = nameCache[typeName]
 
-fun invtype.imageURL(width: Int) = "https://image.eveonline.com/Type/${typeID}_$width.png"
+fun invtype.imageURL(width: Int) = "https://imageserver.eveonline.com/Type/${typeID}_$width.png"
 
-fun invtype.renderURL(width: Int) = "https://image.eveonline.com/Render/${typeID}_$width.png"
+fun invtype.renderURL(width: Int) = "https://imageserver.eveonline.com/Render/${typeID}_$width.png"
 
 //TODO moongo
 
