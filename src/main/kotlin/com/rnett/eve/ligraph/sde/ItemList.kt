@@ -237,7 +237,7 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
         val client = HttpClient(Apache)
 
         val url = "https://evepraisal.com/appraisal.json?market=jita&raw_textarea=${URLEncoder.encode(neededPrices
-                .joinToString("%0A") { it.typeName })}${"&persist=no"}"
+                .joinToString("%0A") { it.typeName }, "utf-8")}${"&persist=no"}"
 
         val text: String = runBlocking {
             client.post<String>(url) {
