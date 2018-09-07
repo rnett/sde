@@ -30,8 +30,8 @@ dependencies {
     implementation("com.github.kizitonwose.time:time:1.0.1")
     implementation("org.slf4j:slf4j-simple:1.7.25")
 
-    implementation("io.ktor:ktor-client-core:0.9.4")
-    implementation("io.ktor:ktor-client-apache:0.9.4")
+    implementation("io.ktor:ktor-client-core:0.9.3")
+    implementation("io.ktor:ktor-client-apache:0.9.3")
 }
 
 configure<JavaPluginConvention> {
