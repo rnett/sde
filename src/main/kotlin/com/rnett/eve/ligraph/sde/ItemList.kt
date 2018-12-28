@@ -8,7 +8,7 @@ import com.rnett.core.ManualCache
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.post
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 import java.net.URLEncoder
 import kotlin.math.ceil
 
@@ -234,7 +234,7 @@ fun getPrices(types: List<invtype>): Map<invtype, Price> {
 
     // update cache
     if (neededPrices.size > 0) {
-        val client = HttpClient(Apache)
+        val client = HttpClient()
 
         val url = "https://evepraisal.com/appraisal.json?market=jita&raw_textarea=${URLEncoder.encode(neededPrices
                 .joinToString("\n") { it.typeName }, "utf-8")}${"&persist=no"}"
