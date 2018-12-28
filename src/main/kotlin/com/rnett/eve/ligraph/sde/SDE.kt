@@ -4,12 +4,14 @@ import com.google.gson.TypeAdapter
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import kotlinx.serialization.*
+import kotlinx.serialization.internal.HexConverter
+import kotlinx.serialization.internal.StringDescriptor
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.transactions.transaction
-
 
 object industryactivityrecipes : IntIdTable(columnName = "typeID\" << 8 | \"activityID\" << 16 | \"productTypeID\" << 24 | \"materialTypeID") {
 
@@ -43,8 +45,22 @@ object industryactivityrecipes : IntIdTable(columnName = "typeID\" << 8 | \"acti
 
 }
 
-class industryactivityrecipe(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<industryactivityrecipe>(industryactivityrecipes)
+
+class industryactivityrecipe(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(industryactivityrecipe::class)
+    companion object : IntEntityClass<industryactivityrecipe>(industryactivityrecipes), KSerializer<industryactivityrecipe> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("industryactivityrecipe")
+
+        override fun serialize(output: Encoder, obj: industryactivityrecipe) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): industryactivityrecipe {
+            return industryactivityrecipe[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -71,7 +87,6 @@ class industryactivityrecipe(id: EntityID<Int>) : IntEntity(id) {
         if (other == null || other !is industryactivityrecipe)
             return false
 
-        other
         return other.typeID == typeID && other.activityID == activityID && other.productTypeID == productTypeID && other.materialTypeID == materialTypeID
     }
 
@@ -140,8 +155,20 @@ class InvTypeAdapter : TypeAdapter<invtype>() {
 }
 
 @JsonAdapter(InvTypeAdapter::class)
-class invtype(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<invtype>(invtypes)
+class invtype(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(invtype::class)
+    companion object : IntEntityClass<invtype>(invtypes), KSerializer<invtype> {
+        override val descriptor: SerialDescriptor = StringDescriptor.withName("invtype")
+
+        override fun serialize(output: Encoder, obj: invtype) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): invtype {
+            return invtype[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -233,8 +260,21 @@ object invgroups : IntIdTable(columnName = "groupID") {
 
 }
 
-class invgroup(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<invgroup>(invgroups)
+class invgroup(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(invgroup::class)
+    companion object : IntEntityClass<invgroup>(invgroups), KSerializer<invgroup> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("invgroup")
+
+        override fun serialize(output: Encoder, obj: invgroup) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): invgroup {
+            return invgroup[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -305,8 +345,21 @@ object invcategories : IntIdTable(columnName = "categoryID") {
 
 }
 
-class invcategory(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<invcategory>(invcategories)
+class invcategory(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(invcategory::class)
+    companion object : IntEntityClass<invcategory>(invcategories), KSerializer<invcategory> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("invcategory")
+
+        override fun serialize(output: Encoder, obj: invcategory) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): invcategory {
+            return invcategory[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -366,13 +419,29 @@ object invtypematerials : IntIdTable(columnName = "typeID\" << 8 | \"materialTyp
         return typeID shl 8 or materialTypeID
     }
     fun findFromPKs(typeID: Int, materialTypeID: Int): invtypematerial? {
+
+        invtypematerial.new { }
+
         return invtypematerial.findById(idFromPKs(typeID, materialTypeID))
     }
 
 }
 
-class invtypematerial(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<invtypematerial>(invtypematerials)
+class invtypematerial(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(invtypematerial::class)
+    companion object : IntEntityClass<invtypematerial>(invtypematerials), KSerializer<invtypematerial> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("invtypematerial")
+
+        override fun serialize(output: Encoder, obj: invtypematerial) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): invtypematerial {
+            return invtypematerial[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -437,8 +506,21 @@ object dgmattributetypes : IntIdTable(columnName = "attributeID") {
 
 }
 
-class dgmattributetype(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<dgmattributetype>(dgmattributetypes)
+class dgmattributetype(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(dgmattributetype::class)
+    companion object : IntEntityClass<dgmattributetype>(dgmattributetypes), KSerializer<dgmattributetype> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("dgmattributetype")
+
+        override fun serialize(output: Encoder, obj: dgmattributetype) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): dgmattributetype {
+            return dgmattributetype[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -536,8 +618,21 @@ object dgmeffects : IntIdTable(columnName = "effectID") {
 
 }
 
-class dgmeffect(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<dgmeffect>(dgmeffects)
+class dgmeffect(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(dgmeffect::class)
+    companion object : IntEntityClass<dgmeffect>(dgmeffects), KSerializer<dgmeffect> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("dgmeffect")
+
+        override fun serialize(output: Encoder, obj: dgmeffect) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): dgmeffect {
+            return dgmeffect[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -631,8 +726,21 @@ object dgmtypeattributes : IntIdTable(columnName = "typeID\" << 8 | \"attributeI
 
 }
 
-class dgmtypeattribute(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<dgmtypeattribute>(dgmtypeattributes)
+class dgmtypeattribute(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(dgmtypeattribute::class)
+    companion object : IntEntityClass<dgmtypeattribute>(dgmtypeattributes), KSerializer<dgmtypeattribute> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("dgmtypeattribute")
+
+        override fun serialize(output: Encoder, obj: dgmtypeattribute) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): dgmtypeattribute {
+            return dgmtypeattribute[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -694,8 +802,21 @@ object dgmtypeeffects : IntIdTable(columnName = "typeID\" << 8 | \"effectID") {
 
 }
 
-class dgmtypeeffect(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<dgmtypeeffect>(dgmtypeeffects)
+class dgmtypeeffect(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(dgmtypeeffect::class)
+    companion object : IntEntityClass<dgmtypeeffect>(dgmtypeeffects), KSerializer<dgmtypeeffect> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("dgmtypeeffect")
+
+        override fun serialize(output: Encoder, obj: dgmtypeeffect) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): dgmtypeeffect {
+            return dgmtypeeffect[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -758,8 +879,21 @@ object invmarketgroups : IntIdTable(columnName = "marketGroupID") {
 
 }
 
-class invmarketgroup(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<invmarketgroup>(invmarketgroups)
+class invmarketgroup(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(invmarketgroup::class)
+    companion object : IntEntityClass<invmarketgroup>(invmarketgroups), KSerializer<invmarketgroup> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("invmarketgroup")
+
+        override fun serialize(output: Encoder, obj: invmarketgroup) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): invmarketgroup {
+            return invmarketgroup[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -840,8 +974,21 @@ object dgmexpressions : IntIdTable(columnName = "expressionID") {
 
 }
 
-class dgmexpression(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<dgmexpression>(dgmexpressions)
+class dgmexpression(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(dgmexpression::class)
+    companion object : IntEntityClass<dgmexpression>(dgmexpressions), KSerializer<dgmexpression> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("dgmexpression")
+
+        override fun serialize(output: Encoder, obj: dgmexpression) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): dgmexpression {
+            return dgmexpression[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -945,8 +1092,21 @@ object mapsolarsystems : IntIdTable(columnName = "solarSystemID") {
 
 }
 
-class mapsolarsystem(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapsolarsystem>(mapsolarsystems)
+class mapsolarsystem(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapsolarsystem::class)
+    companion object : IntEntityClass<mapsolarsystem>(mapsolarsystems), KSerializer<mapsolarsystem> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapsolarsystem")
+
+        override fun serialize(output: Encoder, obj: mapsolarsystem) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapsolarsystem {
+            return mapsolarsystem[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -1046,8 +1206,21 @@ object mapsolarsystemjumps : IntIdTable(columnName = "fromSolarSystemID\" << 8 |
 
 }
 
-class mapsolarsystemjump(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapsolarsystemjump>(mapsolarsystemjumps)
+class mapsolarsystemjump(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapsolarsystemjump::class)
+    companion object : IntEntityClass<mapsolarsystemjump>(mapsolarsystemjumps), KSerializer<mapsolarsystemjump> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapsolarsystemjump")
+
+        override fun serialize(output: Encoder, obj: mapsolarsystemjump) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapsolarsystemjump {
+            return mapsolarsystemjump[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -1121,8 +1294,21 @@ object mapregions : IntIdTable(columnName = "regionID") {
 
 }
 
-class mapregion(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapregion>(mapregions)
+class mapregion(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapregion::class)
+    companion object : IntEntityClass<mapregion>(mapregions), KSerializer<mapregion> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapregion")
+
+        override fun serialize(output: Encoder, obj: mapregion) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapregion {
+            return mapregion[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -1203,8 +1389,21 @@ object mapregionjumps : IntIdTable(columnName = "fromRegionID\" << 8 | \"toRegio
 
 }
 
-class mapregionjump(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapregionjump>(mapregionjumps)
+class mapregionjump(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapregion::class)
+    companion object : IntEntityClass<mapregionjump>(mapregionjumps), KSerializer<mapregionjump> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapregionjump")
+
+        override fun serialize(output: Encoder, obj: mapregionjump) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapregionjump {
+            return mapregionjump[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -1274,8 +1473,21 @@ object mapconstellations : IntIdTable(columnName = "constellationID") {
 
 }
 
-class mapconstellation(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapconstellation>(mapconstellations)
+class mapconstellation(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapconstellation::class)
+    companion object : IntEntityClass<mapconstellation>(mapconstellations), KSerializer<mapconstellation> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapconstellation")
+
+        override fun serialize(output: Encoder, obj: mapconstellation) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapconstellation {
+            return mapconstellation[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
@@ -1361,8 +1573,21 @@ object mapconstellationjumps : IntIdTable(columnName = "fromConstellationID\" <<
 
 }
 
-class mapconstellationjump(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<mapconstellationjump>(mapconstellationjumps)
+class mapconstellationjump(val ID: EntityID<Int>) : IntEntity(ID) {
+
+    @Serializer(mapconstellationjump::class)
+    companion object : IntEntityClass<mapconstellationjump>(mapconstellationjumps), KSerializer<mapconstellationjump> {
+        override val descriptor: SerialDescriptor =
+                StringDescriptor.withName("mapconstellationjump")
+
+        override fun serialize(output: Encoder, obj: mapconstellationjump) {
+            output.encodeString(HexConverter.printHexBinary(obj.hashCode().toString().toByteArray()))
+        }
+
+        override fun deserialize(input: Decoder): mapconstellationjump {
+            return mapconstellationjump[String(HexConverter.parseHexBinary(input.decodeString())).toInt()]
+        }
+    }
 
     // Database columns
 
